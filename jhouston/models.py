@@ -10,5 +10,3 @@ class ErrorReport(models.Model):
     user_agent = models.TextField()
     remote_addr = models.IPAddressField(blank=True)
     data = models.TextField(blank=True)
-
-    
