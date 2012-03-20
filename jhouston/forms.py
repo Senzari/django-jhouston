@@ -14,6 +14,7 @@ class ErrorReportForm(ModelForm):
     def save(self, *a, **k):
         client = Client()
         client.capture("Message", message='foo', data={
-            "extra": self.cleaned_data['line_number']
+            "extra": self.cleaned_data['line_number'],
+            "user_agent": self.cleaned_data['user_agent'], 
         })
         return super(ErrorReportForm, self).save(*a, **k)

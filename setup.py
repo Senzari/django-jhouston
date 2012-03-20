@@ -8,9 +8,9 @@ METADATA = dict(
     author_email='raymond.penners@intenct.nl',
     description='jhouston catches Javascript errors occuring in the browser and automatically posts them to the server.',
     long_description=open('README.rst').read(),
-    url='http://github.com/pennersr/django-jhouston',
+    url='http://github.com/nbv4/django-jhouston',
     keywords='django javascript error',
-    install_requires=['django'],
+    install_requires=['django', 'raven'],
     include_package_data=True,
     classifiers=[
         'Development Status :: 3 - Alpha',
