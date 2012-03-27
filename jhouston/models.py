@@ -61,8 +61,8 @@ def get_pretty_useragent(ua):
 
 def get_filename(url):
     """
-    Given a complete url for a file, returl just the last part.
-    http://senzari.com/static/blah/blah/artist.js -> artist.js
+    Given a complete url for a file, return just the last directory and
+    filename. http://senzari.com/static/blah/views/artist.js -> blah/artist.js
     """
     return "/".join(url.split('/')[-2:])
     
