@@ -2,7 +2,8 @@
   var prevOnError = window.onerror;
   window.onerror = function (errorMsg, url, lineNumber) {
 	  if (typeof(jQuery) != 'undefined') {
-  	    jQuery.ajax({ url: '/jhouston/onerror/',
+  	    jQuery.ajax({
+  	      url: '/jserror/',
   			  type: 'POST',
   			  data: {
   			      message: errorMsg,
