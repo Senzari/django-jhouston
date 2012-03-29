@@ -20,13 +20,13 @@ class LogReport(models.Model):
         log_level = self.log_level
         
         if self.extra:
-            extra = {"extra": json.loads(self.extra)}
+            self.extra = {"extra": json.loads(self.extra)}
                 
         client = Client(settings.SENTRY_DSN)
         client.capture(
             "Message",
             message=self.message,
-            data=extra,
+            data=self.extra,
         )
 
 class ErrorReport(models.Model):
