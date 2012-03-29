@@ -1,3 +1,4 @@
+import json
 import logging
 log = logging.getLogger(__name__)
 
@@ -6,6 +7,27 @@ from django.db import models
 from django.conf import settings
 
 log_format_str = "Front End: %(line_number)s [%(abbv_user_agent)s]"
+
+class LogReport(models.Model):
+    message = models.CharField(max_length=1e9)
+    log_level = models.CharField(max_length=8)
+    extra = models.CharField(help_text='JSON serialized extra information', blank=True, max_length=1e9)
+
+    def save(self, *a, **k):
+        """
+        Don't save to the database, send to sentry instead.
+        """
+        log_level = self.log_level
+        
+        if self.extra:
+            extra = {"extra": json.loads(self.extra)}
+                
+        client = Client(settings.SENTRY_DSN)
+        client.capture(
+            "Message",
+            message=self.message,
+            data=extra,
+        )
 
 class ErrorReport(models.Model):
     message = models.TextField(blank=True)
@@ -30,14 +52,17 @@ class ErrorReport(models.Model):
         msg = "Front End: %s [%s] %s" % (filename, abbv_user_agent, self.message)
         
         client = Client(settings.SENTRY_DSN)
-        client.capture("Message", message=msg, data={
-            
-            "extra": {
-                "linenumber": self.line_number,
-                "user_agent": self.user_agent,
-                "url": self.url,
+        client.capture(
+            "Message",
+            message=msg,
+            data={
+                "extra": {
+                    "linenumber": self.line_number,
+                    "user_agent": self.user_agent,
+                    "url": self.url,
+                }
             }
-        })
+        )
 
 def get_pretty_useragent(ua):
     """
