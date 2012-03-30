@@ -13,7 +13,7 @@ log_format_str = "Front End: %(line_number)s [%(abbv_user_agent)s]"
 class LogReport(models.Model):
     message = models.CharField(max_length=1e9)
     log_level = models.CharField(max_length=8)
-    js_url = models.CharField(max_length=255)
+    js_url = models.CharField(max_length=255, blank=True)
     extra = models.CharField(help_text='JSON serialized extra information', blank=True, max_length=1e9)
 
     def save(self, *a, **k):
