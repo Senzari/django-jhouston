@@ -2,6 +2,8 @@ import json
 import logging
 log = logging.getLogger(__name__)
 
+import httpagentparser
+
 from raven import Client
 from django.db import models
 from django.conf import settings
@@ -11,6 +13,7 @@ log_format_str = "Front End: %(line_number)s [%(abbv_user_agent)s]"
 class LogReport(models.Model):
     message = models.CharField(max_length=1e9)
     log_level = models.CharField(max_length=8)
+    js_url = models.CharField(max_length=255)
     extra = models.CharField(help_text='JSON serialized extra information', blank=True, max_length=1e9)
 
     def save(self, *a, **k):
@@ -18,15 +21,27 @@ class LogReport(models.Model):
         Don't save to the database, send to sentry instead.
         """
         log_level = self.log_level
+        filename = get_filename(self.js_url)
+        
+        data={
+            filename: {
+                'url': self.js_url,
+                'data': {},
+                'query_string': '...',
+                'method': 'POST',
+            },
+            'logger': 'front_end',
+            'site': 'site.name',
+        }
         
         if self.extra:
-            self.extra = {"extra": json.loads(self.extra)}
+            data.update({"extra": json.loads(self.extra)})
                 
         client = Client(settings.SENTRY_DSN)
         client.capture(
             "Message",
             message=self.message,
-            data=self.extra,
+            data=data,
         )
 
 class ErrorReport(models.Model):
@@ -66,23 +81,12 @@ class ErrorReport(models.Model):
 
 def get_pretty_useragent(ua):
     """
-    Given a full user agent string, return either "IE", "Firefox", "Chrome"...
+    Given a full user agent string, return either "IE", "Firefox",
+    "Chrome"... something abbreviated and pretty.
     """
-    ua = ua.lower()
-    
-    if 'firefox' in ua:
-        return 'Firefox'
-    
-    if 'chrome' in ua:
-        return "Chrome"
-    
-    if 'msie 7' in ua:
-        return "IE7"
+    return httpagentparser.simple_detect(s)[1]
 
-    if 'msie 6' in ua:
-        return "IE6"
-    
-    return "Other"
+
 
 def get_filename(url):
     """

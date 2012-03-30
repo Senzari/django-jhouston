@@ -10,7 +10,7 @@ METADATA = dict(
     long_description=open('README.rst').read(),
     url='http://github.com/nbv4/django-jhouston',
     keywords='django javascript error',
-    install_requires=['django', 'raven'],
+    install_requires=['django', 'raven', 'httpagentparser'],
     include_package_data=True,
     classifiers=[
         'Development Status :: 3 - Alpha',
