@@ -84,7 +84,7 @@ def get_pretty_useragent(ua):
     Given a full user agent string, return either "IE", "Firefox",
     "Chrome"... something abbreviated and pretty.
     """
-    return httpagentparser.simple_detect(s)[1]
+    return httpagentparser.simple_detect(ua)[1]
 
 
 
