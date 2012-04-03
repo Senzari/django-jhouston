@@ -37,16 +37,15 @@ In your settings file, define the following setting::
 
     JHOUSTON_STORAGE_METHOD = [setting]
     
-The value of this setting can either be `"sentry"`, `"database"`, or
-`"sentry+database"`.
+The value of this setting can either be:
 
-* `"sentry"` will send all errors and logs to sentry,
-* `"database"` will save the errors and logs into a database table viewable in
+* ``"sentry"`` will send all errors and logs to sentry,
+
+* ``"database"`` will save the errors and logs into a database table viewable in
 the django admin
-* `"sentry+database"` will do both.
 
-If you want to use the `"database"` or `"sentry+database"` setting, you must run
-`python manage.py syncdb` first.
+* ``"sentry+database"`` will do both.
 
-If you want to use the `"sentry"` or `"database+sentry"` setting, you also
-must include a `SENTRY_DSN` setting (see sentry docs).
+If you want to use the ``"database"`` or ``"sentry+database"`` setting, you must run ``python manage.py syncdb`` first.
+
+If you want to use the `"sentry"` or `"database+sentry"` setting, you also must include a `SENTRY_DSN` setting (see sentry docs).
