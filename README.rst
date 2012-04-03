@@ -41,10 +41,12 @@ The value of this setting can either be:
 
 * ``"sentry"`` will send all errors and logs to sentry,
 
-* ``"database"`` will save the errors and logs into a database table viewable in
-the django admin
+* ``"database"`` will save the errors and logs into a database table viewable in the django admin
 
 * ``"sentry+database"`` will do both.
+
+Notes
+=====
 
 If you want to use the ``"database"`` or ``"sentry+database"`` setting, you must run ``python manage.py syncdb`` first.
 
