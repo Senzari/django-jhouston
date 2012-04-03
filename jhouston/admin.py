@@ -16,3 +16,19 @@ class ErrorReportAdmin(admin.ModelAdmin):
                     'remote_addr')
 
 admin.site.register(ErrorReport, ErrorReportAdmin)
+
+
+class LogReportAdmin(admin.ModelAdmin):
+    search_fields = ('message',
+                     'url',
+                     'user_agent',
+                     'data')
+    date_hierarchy = 'reported_at'
+    list_display = ('reported_at', 
+                    'message', 
+                    'url', 
+                    'line_number',
+                    'user_agent',
+                    'remote_addr')
+
+admin.site.register(ErrorReport, ErrorReportAdmin)

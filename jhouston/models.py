@@ -1,5 +1,7 @@
 import json
 import logging
+import warnings
+
 log = logging.getLogger(__name__)
 
 import httpagentparser
@@ -7,19 +9,54 @@ import httpagentparser
 from raven import Client
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
+JHOUSTON_STORAGE_METHOD = getattr(settings, "JHOUSTON_STORAGE_METHOD")
+if not JHOUSTON_STORAGE_METHOD:
+    warnings.warn("No setting for JHOUSTON_STORAGE_METHOD, using database as default")
+    JHOUSTON_STORAGE_METHOD = 'database'
+
+# the format for the front end error message title.
 log_format_str = "Front End: %(line_number)s [%(abbv_user_agent)s]"
 
-class LogReport(models.Model):
+class SaveMixin(object):
+    """
+    Save method for determining if a sentry call, database save, or
+    both is needed. Use this on all Report models, as the logic will always
+    be the same.
+    """
+    def save(self, *a, **k):
+        if "sentry" in JHOUSTON_STORAGE_METHOD:
+            self.send_to_sentry()
+        
+        if "database" in JHOUSTON_STORAGE_METHOD:
+            super(LogReport, self).save(*a, **k)
+
+
+class LogReport(models.Model, SaveMixin):
+    """
+    Each instance of this model represents a generic event that happened on
+    the front end. It could be an error, or any other interesting condition
+    that a developer wants to track.
+    """
+    
+    reported_at = models.DateTimeField(auto_now_add=True)
     message = models.CharField(max_length=1e9)
     log_level = models.CharField(max_length=8)
     js_url = models.CharField(max_length=255, null=True, blank=True)
     extra = models.CharField(help_text='JSON serialized extra information', blank=True, max_length=1e9)
-
-    def save(self, *a, **k):
+    
+    def clean_log_level(self):
+        level = self.cleaned_data['log_level'].upper()
+        if level not in LOG_LEVELS:
+            raise ValidationError('invalid level, must be one of: ' + str(LOG_LEVELS))
+        return level
+    
+    def send_to_sentry(self):
         """
-        Don't save to the database, send to sentry instead.
+        Send this error to sentry where it will be stored and aggregated.
         """
+        
         log_level = self.log_level
         filename = get_filename(self.js_url)
         
@@ -44,7 +81,13 @@ class LogReport(models.Model):
             data=data,
         )
 
-class ErrorReport(models.Model):
+
+class ErrorReport(models.Model, SaveMixin):
+    """
+    Each instance of this model represents an error that happened on the front
+    end.
+    """
+    
     message = models.TextField(blank=True)
     reported_at = models.DateTimeField(auto_now_add=True)
     # Ideally, URLField(max_length=1024) would be used.  However,
@@ -54,12 +97,12 @@ class ErrorReport(models.Model):
     user_agent = models.TextField()
     remote_addr = models.IPAddressField(blank=True)
     data = models.TextField(blank=True)
-    
-    
-    def save(self, *a, **k):
+
+    def send_to_sentry(self):
         """
-        Don't save to database, post to sentry instead.
+        Send this error to sentry where it will be stored and aggregated.
         """
+        
         line_number = self.line_number
         abbv_user_agent = get_pretty_useragent(self.user_agent)
         filename = get_filename(self.url)
@@ -79,13 +122,13 @@ class ErrorReport(models.Model):
             }
         )
 
+
 def get_pretty_useragent(ua):
     """
     Given a full user agent string, return either "IE", "Firefox",
     "Chrome"... something abbreviated and pretty.
     """
     return httpagentparser.simple_detect(ua)[1]
-
 
 
 def get_filename(url):
