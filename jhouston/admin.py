@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from models import ErrorReport
+from models import ErrorReport, LogReport
 
 class ErrorReportAdmin(admin.ModelAdmin):
     search_fields = ('message',
@@ -20,15 +20,10 @@ admin.site.register(ErrorReport, ErrorReportAdmin)
 
 class LogReportAdmin(admin.ModelAdmin):
     search_fields = ('message',
-                     'url',
-                     'user_agent',
-                     'data')
+                     'log_level')
     date_hierarchy = 'reported_at'
-    list_display = ('reported_at', 
-                    'message', 
-                    'url', 
-                    'line_number',
-                    'user_agent',
-                    'remote_addr')
+    list_display = ('log_level',
+                    'reported_at', 
+                    'message')
 
-admin.site.register(ErrorReport, ErrorReportAdmin)
+admin.site.register(LogReport, LogReportAdmin)
