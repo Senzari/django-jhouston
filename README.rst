@@ -50,4 +50,4 @@ Notes
 
 If you want to use the ``"database"`` or ``"sentry+database"`` setting, you must run ``python manage.py syncdb`` first.
 
-If you want to use the `"sentry"` or `"database+sentry"` setting, you also must include a `SENTRY_DSN` setting (see sentry docs).
+If you want to use the ``"sentry"`` or ``"sentry+database"`` setting, you also must include a `SENTRY_DSN` setting (see sentry docs).
