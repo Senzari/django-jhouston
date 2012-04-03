@@ -11,7 +11,7 @@ from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
 
-JHOUSTON_STORAGE_METHOD = getattr(settings, "JHOUSTON_STORAGE_METHOD")
+JHOUSTON_STORAGE_METHOD = getattr(settings, "JHOUSTON_STORAGE_METHOD", None)
 if not JHOUSTON_STORAGE_METHOD:
     warnings.warn("No setting for JHOUSTON_STORAGE_METHOD, using database as default")
     JHOUSTON_STORAGE_METHOD = 'database'
