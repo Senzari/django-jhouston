@@ -32,7 +32,7 @@ class SaveMixin(object):
             super(LogReport, self).save(*a, **k)
 
 
-class LogReport(models.Model, SaveMixin):
+class LogReport(SaveMixin, models.Model):
     """
     Each instance of this model represents a generic event that happened on
     the front end. It could be an error, or any other interesting condition
@@ -82,7 +82,7 @@ class LogReport(models.Model, SaveMixin):
         )
 
 
-class ErrorReport(models.Model, SaveMixin):
+class ErrorReport(SaveMixin, models.Model):
     """
     Each instance of this model represents an error that happened on the front
     end.
