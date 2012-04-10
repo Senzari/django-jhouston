@@ -10,7 +10,6 @@ from raven import Client
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
-
 JHOUSTON_STORAGE_METHOD = getattr(settings, "JHOUSTON_STORAGE_METHOD", None)
 if not JHOUSTON_STORAGE_METHOD:
     warnings.warn("No setting for JHOUSTON_STORAGE_METHOD, using database as default")
@@ -45,6 +44,7 @@ class LogReport(models.Model, SaveMixin):
     log_level = models.CharField(max_length=8)
     js_url = models.CharField(max_length=255, null=True, blank=True)
     extra = models.CharField(help_text='JSON serialized extra information', blank=True, max_length=1e9)
+    stack_trace = models.TextField(blank=True)
     
     def clean_log_level(self):
         level = self.cleaned_data['log_level'].upper()
@@ -56,7 +56,7 @@ class LogReport(models.Model, SaveMixin):
         """
         Send this error to sentry where it will be stored and aggregated.
         """
-        
+        print self.stack_trace
         log_level = self.log_level
         filename = get_filename(self.js_url)
         

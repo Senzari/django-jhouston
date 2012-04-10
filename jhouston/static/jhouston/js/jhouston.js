@@ -16,7 +16,7 @@
           message: errorMsg,
           line_number: lineNumber,
           url: url,
-          stack: trace
+          stack_trace: trace
         }
       });
     }
